@@ -7,10 +7,8 @@ def get_ip_info(ip):
 
         if response.status_code == 200:
             data = response.json()
-            return {
-                "ip": ip,
-                "country": data.get("country"),
-                "org": data.get("org")
-            }
+            return {"ip": ip,
+                    "country": data.get("country"),
+                    "org": data.get("org")}
     except:
         return None
