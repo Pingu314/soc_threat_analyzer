@@ -1,6 +1,5 @@
 .venv/
 .idea/
 __pycache__/
-output/
-output/allerts.csv
+output/alerts.csv
 *.pyc
