@@ -3,37 +3,46 @@ import logging
 import os
 
 from src.parser import parse_log
-from src.detector import detect_bruteforce
+from src.detector import run_all_detections
 from src.threat_intel import get_ip_info
 from src.risk_scoring import calculate_risk, get_severity, map_mitre
-from config.settings import THRESHOLD, WINDOW_MINUTES
 
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-def run_pipeline():
+def run_pipeline() -> list:
     logger.info("Starting SOC pipeline...")
     logs = parse_log("data/logs.txt")
     logger.info(f"Parsed {len(logs)} log entries.")
-    alerts = detect_bruteforce(logs, THRESHOLD, WINDOW_MINUTES)
-    logger.info(f"Detected {len(alerts)} brute-force alert(s).")
+
+    alerts = run_all_detections(logs)
+    logger.info(f"Detected {len(alerts)} alert(s) across all rules.")
 
     final_alerts = []
 
     for alert in alerts:
-        intel = get_ip_info(alert["ip"])
+        ip = alert.get("ip")
+        intel = get_ip_info(ip) if ip else None
         risk = calculate_risk(alert, intel)
 
-        result = {"ip": alert["ip"],
-                  "count": alert["count"],
-                  "country": intel["country"] if intel else "Unknown",
-                  "org": intel["org"] if intel else "Unknown",
-                  "risk_score": risk,
-                  "severity": get_severity(risk),
-                  "mitre_technique": map_mitre(alert.get("rule"))}
+        result = {"rule_id":        alert["rule_id"],
+                  "rule":           alert["rule"],
+                  "mitre":          alert["mitre"],
+                  "sigma_severity": alert["sigma_severity"],
+                  "ip":             ip or "multiple",
+                  "user":           alert.get("user") or "multiple",
+                  "count":          alert["count"],
+                  "country":        intel["country"] if intel else "Unknown",
+                  "org":            intel["org"] if intel else "Unknown",
+                  "risk_score":     risk,
+                  "severity":       get_severity(risk)}
 
-        logger.info(f"Alert: {result}")
+        if "distinct_users" in alert:
+            result["distinct_users"] = ", ".join(alert["distinct_users"])
+        if "distinct_ips" in alert:
+            result["distinct_ips"] = ", ".join(alert["distinct_ips"])
+
         final_alerts.append(result)
 
     return final_alerts
@@ -42,12 +51,17 @@ def run_pipeline():
 if __name__ == "__main__":
     alerts = run_pipeline()
 
+    for alert in alerts:
+        print(alert)
+
     os.makedirs("output", exist_ok=True)
 
-    fieldnames = ["ip", "count", "country", "org", "risk_score", "severity", "mitre_technique"]
+    fieldnames = ["rule_id", "rule", "mitre", "sigma_severity",
+                  "ip", "user", "count", "country", "org",
+                  "risk_score", "severity", "distinct_users", "distinct_ips"]
 
     with open("output/alerts.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(alerts)
 
