@@ -30,3 +30,4 @@ def parse_log(file_path: str) -> list[dict]:
 
     if skipped:
         logger.warning(f"Skipped {skipped} unparseable line(s) in {file_path}")
+    return logs
