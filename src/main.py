@@ -5,7 +5,7 @@ import os
 from src.parser import parse_log
 from src.detector import run_all_detections
 from src.threat_intel import get_ip_info
-from src.risk_scoring import calculate_risk, get_severity, map_mitre
+from src.risk_scoring import calculate_risk, get_severity
 
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s [%(levelname)s] %(message)s")
