@@ -51,4 +51,4 @@ if __name__ == "__main__":
         writer.writeheader()
         writer.writerows(alerts)
 
-    logger.info(f"Saved {len(alerts)} alert(s) to out")
+    logger.info(f"Saved {len(alerts)} alert(s) to output/alerts.csv")
