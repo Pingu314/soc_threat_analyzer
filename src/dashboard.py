@@ -1,7 +1,9 @@
+import logging
 from flask import Flask
 from src.main import run_pipeline
 
 app = Flask(__name__)
+logger = logging.getLogger(__name__)
 
 @app.route("/")
 def home():
@@ -11,8 +13,9 @@ def home():
 
 @app.route("/alerts")
 def alerts():
-    return {"alerts": run_pipeline(),
-            "total_alerts": len(run_pipeline())}
+    result = run_pipeline()
+    return {"alerts": result,
+            "total_alerts": len(result)}
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
