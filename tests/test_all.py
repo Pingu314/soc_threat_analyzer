@@ -99,7 +99,7 @@ class TestDetectPasswordSpraying:
         alerts = detect_password_spraying(spray_logs)
         assert len(alerts) == 1
         assert alerts[0]["mitre"] == "T1110.003"
-        assert set(alerts[0]["distinct_users"]) == {"admin", "root", "guest"}
+        assert set(alerts[0]["distinct_users"]) == {"user_0", "user_1", "user_2"}
 
     def test_no_alert_single_user(self, base_time):
         logs = [{"ip": "1.2.3.4",
