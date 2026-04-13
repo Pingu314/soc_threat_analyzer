@@ -29,7 +29,9 @@ All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thre
 
 Running `python src/main.py` against the sample logs produces 9 alerts across all three rules:
 
-```
+```text
+$ python src/main.py
+
 [bf-001] Brute force from 185.220.101.1 (4 attempts)
 [bf-001] Brute force from 192.168.1.10 (3 attempts)
 [bf-001] Brute force from 1.1.1.1 (3 attempts)
@@ -39,29 +41,56 @@ Running `python src/main.py` against the sample logs produces 9 alerts across al
 [it-001] Impossible travel for 'admin' across ['192.168.1.10', '45.83.64.1']
 [it-001] Impossible travel for 'jsmith' across ['103.21.244.0', '185.220.101.1']
 [it-001] Impossible travel for 'test' across ['45.83.64.1', '8.8.8.8']
+
 Total alerts after deduplication: 9
 ```
 
-**Sample enriched alerts:**
+**Sample enriched alerts (JSON):**
 
 ```json
-{"rule_id": "bf-001", "rule": "Brute Force Detection", "mitre": "T1110.001",
- "sigma_severity": "high", "ip": "185.220.101.1", "user": "multiple", "count": 4,
- "country": "DE", "org": "AS60729 Stiftung Erneuerbare Freiheit",
- "risk_score": 12, "severity": "HIGH"}
-
-{"rule_id": "ps-001", "rule": "Password Spraying Detection", "mitre": "T1110.003",
- "sigma_severity": "high", "ip": "45.83.64.1", "user": "multiple", "count": 5,
- "country": "DE", "org": "AS208843 Alpha Strike Labs GmbH",
- "risk_score": 25, "severity": "HIGH",
- "distinct_users": "admin, guest, operator, root, test"}
-
-{"rule_id": "it-001", "rule": "Impossible Travel Detection", "mitre": "T1078",
- "sigma_severity": "medium", "ip": "multiple", "user": "jsmith", "count": 2,
- "country": "Unknown", "org": "Unknown",
- "risk_score": 10, "severity": "MEDIUM",
- "distinct_ips": "103.21.244.0, 185.220.101.1"}
+{
+  "rule_id": "bf-001",
+  "rule": "Brute Force Detection",
+  "mitre": "T1110.001",
+  "sigma_severity": "high",
+  "ip": "185.220.101.1",
+  "user": "multiple",
+  "count": 4,
+  "country": "DE",
+  "org": "AS60729 Stiftung Erneuerbare Freiheit",
+  "risk_score": 12,
+  "severity": "HIGH"
+}
+{
+  "rule_id": "ps-001",
+  "rule": "Password Spraying Detection",
+  "mitre": "T1110.003",
+  "sigma_severity": "high",
+  "ip": "45.83.64.1",
+  "user": "multiple",
+  "count": 5,
+  "country": "DE",
+  "org": "AS208843 Alpha Strike Labs GmbH",
+  "risk_score": 25,
+  "severity": "HIGH",
+  "distinct_users": "admin, guest, operator, root, test"
+}
+{
+  "rule_id": "it-001",
+  "rule": "Impossible Travel Detection",
+  "mitre": "T1078",
+  "sigma_severity": "medium",
+  "ip": "multiple",
+  "user": "jsmith",
+  "count": 2,
+  "country": "Unknown",
+  "org": "Unknown",
+  "risk_score": 10,
+  "severity": "MEDIUM",
+  "distinct_ips": "103.21.244.0, 185.220.101.1"
+}
 ```
+
 
 ## Architecture
 
