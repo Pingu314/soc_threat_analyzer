@@ -29,3 +29,10 @@
 2026-04-01 10:20:10 LOGIN FAILED user=admin ip=45.83.64.1
 2026-04-01 10:20:15 LOGIN FAILED user=admin ip=45.83.64.1
 2026-04-01 10:20:20 LOGIN FAILED user=admin ip=45.83.64.1
+# --- Impossible Travel: successful logins from multiple IPs within time window ---
+2026-04-01 10:25:00 LOGIN SUCCESS user=jsmith ip=185.220.101.1
+2026-04-01 10:27:30 LOGIN SUCCESS user=jsmith ip=103.21.244.0
+2026-04-01 10:30:00 LOGIN SUCCESS user=root ip=45.83.64.1
+2026-04-01 10:31:45 LOGIN SUCCESS user=root ip=8.8.8.8
+2026-04-01 10:35:00 LOGIN SUCCESS user=admin ip=192.168.1.10
+2026-04-01 10:37:00 LOGIN SUCCESS user=admin ip=1.1.1.1
