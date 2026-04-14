@@ -49,11 +49,9 @@ def get_ip_info(ip: str) -> dict | None:
         response = requests.get(url, timeout=3)
         if response.status_code == 200:
             data = response.json()
-            result = {
-                "ip": ip,
-                "country": data.get("country", "Unknown"),
-                "org": data.get("org", "Unknown"),
-            }
+            result = {"ip": ip,
+                      "country": data.get("country", "Unknown"),
+                      "org": data.get("org", "Unknown")}
             _cache[ip] = result
             return result
         else:

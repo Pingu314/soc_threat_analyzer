@@ -12,7 +12,6 @@ from src.threat_intel import is_private_ip
 
 
 # risk_scoring
-
 class TestGetSeverity:
     def test_low(self):
         assert get_severity(0) == "LOW"
@@ -73,20 +72,15 @@ class TestMapMitre:
 
 
 # detector
-
 class TestDetectBruteforce:
     @staticmethod
     def _make_logs(ip, count, minutes_apart=0.1):
         base = datetime(2026, 1, 1, 10, 0, 0)
-        return [
-            {
-                "ip": ip,
+        return [{"ip": ip,
                 "user": "admin",
                 "status": "FAILED",
-                "timestamp": base + timedelta(minutes=i * minutes_apart),
-            }
-            for i in range(count)
-        ]
+                "timestamp": base + timedelta(minutes=i * minutes_apart)}
+                for i in range(count)]
 
     def test_triggers_at_threshold(self):
         alerts = detect_bruteforce(self._make_logs("1.2.3.4", 3), threshold=3, window_minutes=5)
@@ -98,18 +92,13 @@ class TestDetectBruteforce:
         assert detect_bruteforce(self._make_logs("1.2.3.4", 2), threshold=3, window_minutes=5) == []
 
     def test_outside_time_window(self):
-        assert (
-            detect_bruteforce(self._make_logs("1.2.3.4", 3, minutes_apart=10), threshold=3, window_minutes=5)
-            == []
-        )
+        assert (detect_bruteforce(self._make_logs("1.2.3.4", 3, minutes_apart=10), threshold=3, window_minutes=5) == [])
 
     def test_success_not_counted(self):
         base = datetime(2026, 1, 1, 10, 0, 0)
-        logs = [
-            {"ip": "1.2.3.4", "user": "admin", "status": "FAILED", "timestamp": base},
-            {"ip": "1.2.3.4", "user": "admin", "status": "SUCCESS", "timestamp": base + timedelta(seconds=10)},
-            {"ip": "1.2.3.4", "user": "admin", "status": "FAILED", "timestamp": base + timedelta(seconds=20)},
-        ]
+        logs = [{"ip": "1.2.3.4", "user": "admin", "status": "FAILED", "timestamp": base},
+                {"ip": "1.2.3.4", "user": "admin", "status": "SUCCESS", "timestamp": base + timedelta(seconds=10)},
+                {"ip": "1.2.3.4", "user": "admin", "status": "FAILED", "timestamp": base + timedelta(seconds=20)}]
         assert detect_bruteforce(logs, threshold=3, window_minutes=5) == []
 
 
@@ -121,15 +110,11 @@ class TestDetectPasswordSpraying:
         assert set(alerts[0]["distinct_users"]) == {"user_0", "user_1", "user_2"}
 
     def test_no_alert_single_user(self, base_time):
-        logs = [
-            {
-                "ip": "1.2.3.4",
+        logs = [{"ip": "1.2.3.4",
                 "user": "admin",
                 "status": "FAILED",
-                "timestamp": base_time + timedelta(seconds=i),
-            }
-            for i in range(5)
-        ]
+                "timestamp": base_time + timedelta(seconds=i)}
+                for i in range(5)]
         assert detect_password_spraying(logs) == []
 
     def test_rule_id(self, spray_logs):
@@ -145,27 +130,19 @@ class TestDetectImpossibleTravel:
         assert alerts[0]["user"] == "admin"
 
     def test_no_alert_single_ip(self, base_time):
-        logs = [
-            {
-                "ip": "1.2.3.4",
+        logs = [{"ip": "1.2.3.4",
                 "user": "admin",
                 "status": "SUCCESS",
-                "timestamp": base_time + timedelta(seconds=i),
-            }
-            for i in range(3)
-        ]
+                "timestamp": base_time + timedelta(seconds=i)}
+                for i in range(3)]
         assert detect_impossible_travel(logs) == []
 
     def test_failed_logins_not_counted(self, base_time):
-        logs = [
-            {
-                "ip": f"10.0.0.{i+1}",
+        logs = [{"ip": f"10.0.0.{i+1}",
                 "user": "admin",
                 "status": "FAILED",
-                "timestamp": base_time + timedelta(minutes=i),
-            }
-            for i in range(3)
-        ]
+                "timestamp": base_time + timedelta(minutes=i)}
+                for i in range(3)]
         assert detect_impossible_travel(logs) == []
 
     def test_rule_id(self, travel_logs):
@@ -188,7 +165,6 @@ class TestRunAllDetections:
 
 
 # threat_intel
-
 class TestIsPrivateIp:
     def test_private_ranges(self):
         assert is_private_ip("192.168.1.10") is True
@@ -204,7 +180,6 @@ class TestIsPrivateIp:
 
 
 # parser
-
 class TestParseLog:
     def test_parses_failed_login(self, tmp_path):
         log_file = tmp_path / "test.log"
