@@ -13,11 +13,9 @@ _cached_alerts: list = run_pipeline()
 
 @app.route("/")
 def home():
-    return {
-        "message": "SOC Dashboard running",
+    return {"message": "SOC Dashboard running",
         "endpoint": "/alerts",
-        "description": "View detected security alerts",
-    }
+        "description": "View detected security alerts"}
 
 
 @app.route("/alerts")

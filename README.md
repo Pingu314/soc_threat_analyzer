@@ -189,7 +189,7 @@ python -m src.main
 
 Flask dashboard:
 ```bash
-python src/dashboard.py
+python -m src.dashboard
 # → http://localhost:5000/alerts
 ```
 
