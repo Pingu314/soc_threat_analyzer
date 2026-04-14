@@ -35,10 +35,33 @@ SIGMA_RULES = { "brute_force": {"title": "Brute Force Detection",
                                       "severity": "medium"}}
 
 def _get_window(times: list, index: int, window_minutes: int) -> list:
+    """Return all timestamps in 'times' that fall within a sliding window starting at index.
+
+    Args:
+        times:          Sorted list of datetime objects.
+        index:          Starting index; defines the window's anchor time t0.
+        window_minutes: Width of the window in minutes.
+
+    Returns:
+        A list of datetimes t such that t0 <= t <= t0 + window_minutes.
+    """
     t0 = times[index]
     return [t for t in times if t0 <= t <= t0 + timedelta(minutes=window_minutes)]
 
 def detect_bruteforce(logs: list, threshold: int = THRESHOLD, window_minutes: int = WINDOW_MINUTES) -> list:
+    """Detect brute-force login attempts (SIGMA rule bf-001 / MITRE T1110.001).
+
+    Flags any source IP that accumulates >= threshold failed logins within a
+    rolling window of window_minutes.
+
+    Args:
+        logs:           Parsed log entries (list of dicts from parser.parse_log).
+        threshold:      Minimum number of failures to trigger an alert.
+        window_minutes: Length of the detection window in minutes.
+
+    Returns:
+        A list of alert dicts, one per triggering IP.
+    """
     rule = SIGMA_RULES["brute_force"]
     alerts = []
     attempts: dict = defaultdict(list)
@@ -67,6 +90,19 @@ def detect_bruteforce(logs: list, threshold: int = THRESHOLD, window_minutes: in
 
 
 def detect_password_spraying(logs: list, threshold: int = SPRAY_THRESHOLD, window_minutes: int = SPRAY_WINDOW_MINUTES) -> list:
+    """Detect password-spraying attacks (SIGMA rule ps-001 / MITRE T1110.003).
+
+    Flags any source IP that targets >= threshold distinct usernames within a
+    rolling window of window_minutes.
+
+    Args:
+        logs:           Parsed log entries (list of dicts from parser.parse_log).
+        threshold:      Minimum number of distinct target users to trigger an alert.
+        window_minutes: Length of the detection window in minutes.
+
+    Returns:
+        A list of alert dicts, one per triggering IP.
+    """
     rule = SIGMA_RULES["password_spraying"]
     alerts = []
     attempts: dict = defaultdict(list)
@@ -102,6 +138,19 @@ def detect_password_spraying(logs: list, threshold: int = SPRAY_THRESHOLD, windo
 
 
 def detect_impossible_travel(logs: list, threshold: int = TRAVEL_THRESHOLD, window_minutes: int = TRAVEL_WINDOW_MINUTES) -> list:
+    """Detect impossible-travel logins (SIGMA rule it-001 / MITRE T1078).
+
+    Flags any user account seen logging in from >= threshold distinct source IPs
+    within a rolling window of window_minutes.
+
+    Args:
+        logs:           Parsed log entries (list of dicts from parser.parse_log).
+        threshold:      Minimum number of distinct source IPs to trigger an alert.
+        window_minutes: Length of the detection window in minutes.
+
+    Returns:
+        A list of alert dicts, one per triggering user account.
+    """
     rule = SIGMA_RULES["impossible_travel"]
     alerts = []
     attempts: dict = defaultdict(list)
@@ -137,6 +186,19 @@ def detect_impossible_travel(logs: list, threshold: int = TRAVEL_THRESHOLD, wind
 
 
 def run_all_detections(logs: list, threshold: int = THRESHOLD, window_minutes: int = WINDOW_MINUTES) -> list:
+    """Run all SIGMA detection rules and return deduplicated alerts.
+
+    Runs brute-force, password-spraying, and impossible-travel detections in
+    sequence, then removes duplicate alerts keyed on (ip, user, rule_id).
+
+    Args:
+        logs:           Parsed log entries (list of dicts from parser.parse_log).
+        threshold:      Brute-force failure threshold (passed through).
+        window_minutes: Brute-force detection window in minutes (passed through).
+
+    Returns:
+        A deduplicated list of alert dicts ready for enrichment and scoring.
+    """
     all_alerts = (detect_bruteforce(logs, threshold, window_minutes)
                   + detect_password_spraying(logs)
                   + detect_impossible_travel(logs))
