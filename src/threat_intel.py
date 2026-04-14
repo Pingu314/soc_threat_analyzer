@@ -7,12 +7,32 @@ logger = logging.getLogger(__name__)
 _cache = {}
 
 def is_private_ip(ip: str) -> bool:
+    """Return True if the given IP address is in a private (RFC 1918) range.
+
+    Args:
+        ip: IPv4 or IPv6 address string.
+
+    Returns:
+        True if private/loopback, False otherwise. Returns False for unparseable input.
+    """
     try:
         return ipaddress.ip_address(ip).is_private
     except ValueError:
         return False
 
 def get_ip_info(ip: str) -> dict | None:
+    """Enrich an IP address with geolocation and organisation data via ipinfo.io.
+
+    Private IPs are handled locally without an API call. Results are cached
+    in-memory for the lifetime of the process to avoid redundant requests.
+
+    Args:
+        ip: IPv4 address string to look up.
+
+    Returns:
+        A dict with keys 'ip', 'country', and 'org', or None on API failure.
+        Private IPs return country='PRIVATE' and org='Internal Network'.
+    """
     if is_private_ip(ip):
         logger.debug(f"Skipping API call for private IP: {ip}")
         return {"ip": ip,
