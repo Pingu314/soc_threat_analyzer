@@ -27,7 +27,7 @@ All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thre
 
 ## Example Output
 
-Running `python src/main.py` against the sample logs produces 9 alerts across all three rules:
+Running `python -m src.main` against the sample logs produces 8 alerts across all three rules:
 
 ```text
 $ python -m src.main
@@ -37,12 +37,11 @@ $ python -m src.main
 [bf-001] Brute force from 1.1.1.1 (3 attempts)
 [bf-001] Brute force from 45.83.64.1 (5 attempts)
 [ps-001] Password spraying from 45.83.64.1 targeting ['admin', 'guest', 'operator', 'root', 'test']
-[it-001] Impossible travel for 'root' across ['185.220.101.1', '45.83.64.1']
-[it-001] Impossible travel for 'admin' across ['192.168.1.10', '45.83.64.1']
+[it-001] Impossible travel for 'admin' across ['1.1.1.1', '192.168.1.10']
 [it-001] Impossible travel for 'jsmith' across ['103.21.244.0', '185.220.101.1']
-[it-001] Impossible travel for 'test' across ['45.83.64.1', '8.8.8.8']
+[it-001] Impossible travel for 'root' across ['45.83.64.1', '8.8.8.8']
 
-Total alerts after deduplication: 9
+Total alerts after deduplication: 8
 ```
 
 **Sample enriched alerts (JSON):**
@@ -145,7 +144,7 @@ dashboard.py    -> Flask REST API at /alerts
 - CSV export with full alert context
 - Flask REST dashboard at `/alerts`
 - Structured logging via Python `logging` module
-- 32 unit and integration tests with pytest and shared fixtures
+- 33 unit and integration tests with pytest and shared fixtures
 
 ## Technologies
 
