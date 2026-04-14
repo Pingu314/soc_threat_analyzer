@@ -12,6 +12,18 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 def run_pipeline() -> list:
+    """Run the full SOC detection pipeline end-to-end.
+
+    Steps:
+        1. Parse authentication logs from data/logs.txt.
+        2. Run all SIGMA detection rules (brute-force, spraying, impossible travel).
+        3. Enrich each alert with IP geolocation via ipinfo.io.
+        4. Calculate a risk score and severity label for each alert.
+        5. Collect and return all enriched alert dicts.
+
+    Returns:
+        A list of fully enriched and scored alert dicts, ready for export or display.
+    """
     logger.info("Starting SOC pipeline...")
     logs = parse_log("data/logs.txt")
     logger.info(f"Parsed {len(logs)} log entries.")
