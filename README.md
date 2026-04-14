@@ -30,7 +30,7 @@ All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thre
 Running `python src/main.py` against the sample logs produces 9 alerts across all three rules:
 
 ```text
-$ python src/main.py
+$ python -m src.main
 
 [bf-001] Brute force from 185.220.101.1 (4 attempts)
 [bf-001] Brute force from 192.168.1.10 (3 attempts)
@@ -185,7 +185,7 @@ soc_threat_analyzer/
 
 ```bash
 pip install -r requirements.txt
-python src/main.py
+python -m src.main
 ```
 
 Flask dashboard:
@@ -196,7 +196,7 @@ python src/dashboard.py
 
 Tests:
 ```bash
-python -m pytest tests/
+python -m pytest tests/ -v
 ```
 
 ## Configuration
