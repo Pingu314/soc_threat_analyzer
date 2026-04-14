@@ -13,17 +13,17 @@ _cached_alerts: list = run_pipeline()
 
 @app.route("/")
 def home():
-        return {
-                    "message": "SOC Dashboard running",
-                    "endpoint": "/alerts",
-                    "description": "View detected security alerts",
-        }
+    return {
+        "message": "SOC Dashboard running",
+        "endpoint": "/alerts",
+        "description": "View detected security alerts",
+    }
 
 
 @app.route("/alerts")
 def alerts():
-        return {"alerts": _cached_alerts, "total_alerts": len(_cached_alerts)}
+    return {"alerts": _cached_alerts, "total_alerts": len(_cached_alerts)}
 
 
 if __name__ == "__main__":
-        app.run(debug=False)
+    app.run(debug=False)
