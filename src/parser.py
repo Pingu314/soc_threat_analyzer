@@ -4,6 +4,24 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 def parse_log(file_path: str) -> list[dict]:
+    """Parse an authentication log file into a list of structured log entries.
+
+    Each line must follow the format:
+        <timestamp> <field> <field> <STATUS> user=<username> ip=<ip_address>
+
+    Malformed or unparseable lines are silently skipped and counted.
+    A warning is emitted at the end if any lines were skipped.
+
+    Args:
+        file_path: Path to the log file to parse.
+
+    Returns:
+        A list of dicts, each with keys:
+            - 'timestamp' (datetime): parsed event time
+            - 'status'    (str):      login result, e.g. 'FAILED' or 'SUCCESS'
+            - 'user'      (str):      username from the log line
+            - 'ip'        (str):      source IP address
+    """
     logs = []
     skipped = 0
 
