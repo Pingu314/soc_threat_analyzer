@@ -153,8 +153,8 @@ class TestDetectImpossibleTravel:
 class TestRunAllDetections:
     def test_deduplication(self, brute_force_logs):
         alerts = run_all_detections(brute_force_logs + brute_force_logs)
-        rule_ids = [a["rule_id"] for a in alerts if a.get("ip") == "185.220.101.1"]
-        assert len(rule_ids) == rule_ids.count(rule_ids[0])
+        bf_alerts = [a for a in alerts if a.get("ip") == "185.220.101.1"]
+        assert len(bf_alerts) == 1  # same IP+rule_id combo must not appear twice
 
     def test_all_rules_fire(self, mixed_logs):
         alerts = run_all_detections(mixed_logs)
