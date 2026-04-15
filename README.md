@@ -121,7 +121,7 @@ dashboard.py    -> Flask REST API at /alerts
 
 | Factor | Points |
 |--------|--------|
-| Each failed login | +3 |
+| Each login event counted for the alert | +3 |
 | Suspicious country (RU, CN, KP) | +5 |
 | Tor exit node detected in org | +5 |
 | Each distinct user targeted (spraying) | +2 |
