@@ -1,6 +1,6 @@
 import logging
 
-from config.settings import (SUSPICIOUS_COUNTRIES, FAILED_LOGIN_WEIGHT,
+from config.settings import (SUSPICIOUS_COUNTRIES, LOGIN_EVENT_WEIGHT,
                              SUSPICIOUS_COUNTRY_SCORE, TOR_SCORE,
                              SPRAY_USER_WEIGHT, TRAVEL_IP_WEIGHT,
                              SEVERITY_HIGH, SEVERITY_MEDIUM)
@@ -15,7 +15,7 @@ def calculate_risk(alert: dict, intel: dict | None) -> int:
     """Calculate a numeric risk score for an alert using threat intelligence data.
 
     Scoring factors (weights configured in config/settings.py):
-        - Each failed login attempt:        +FAILED_LOGIN_WEIGHT
+        - Each login event for this alert:  +LOGIN_EVENT_WEIGHT
         - Suspicious source country:        +SUSPICIOUS_COUNTRY_SCORE
         - Tor exit node detected in org:    +TOR_SCORE
         - Each distinct user (spraying):    +SPRAY_USER_WEIGHT per user
@@ -30,7 +30,7 @@ def calculate_risk(alert: dict, intel: dict | None) -> int:
     """
     score = 0
 
-    score += alert["count"] * FAILED_LOGIN_WEIGHT
+    score += alert["count"] * LOGIN_EVENT_WEIGHT
 
     if intel:
         if intel.get("country") in SUSPICIOUS_COUNTRIES:
