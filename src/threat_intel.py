@@ -8,13 +8,16 @@ _cache = {}
 
 
 def is_private_ip(ip: str) -> bool:
-    """Return True if the given IP address is in a private (RFC 1918) range.
+    """Return True if the given IP address is private, loopback, or link-local.
+
+    Uses Python's ipaddress.is_private, which covers RFC 1918 ranges,
+    loopback, link-local, and other reserved address spaces.
 
     Args:
         ip: IPv4 or IPv6 address string.
 
     Returns:
-        True if private/loopback, False otherwise. Returns False for
+        True if private/loopback/link-local, False otherwise. Returns False for
         unparseable input.
     """
     try:
@@ -30,7 +33,7 @@ def get_ip_info(ip: str) -> dict | None:
     in-memory for the lifetime of the process to avoid redundant requests.
 
     Args:
-        ip: IPv4 address string to look up.
+        ip: IP address string to look up.
 
     Returns:
         A dict with keys 'ip', 'country', and 'org', or None on API failure.
