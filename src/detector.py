@@ -48,6 +48,14 @@ def detect_bruteforce(logs, threshold=THRESHOLD, window_minutes=WINDOW_MINUTES):
     """Detect brute-force login attempts (bf-001 / T1110.001).
 
     Flags any source IP with >= threshold failed logins within window_minutes.
+
+    Args:
+        logs: List of parsed log dicts from parser.parse_log.
+        threshold: Minimum failed login count to trigger an alert.
+        window_minutes: Sliding time window in minutes.
+
+    Returns:
+        A list of alert dicts with keys: ip, user, count, start_time, rule, rule_id, mitre, sigma_severity.
     """
     rule = SIGMA_RULES["brute_force"]
     alerts = []
@@ -80,6 +88,14 @@ def detect_password_spraying(logs, threshold=SPRAY_THRESHOLD, window_minutes=SPR
     """Detect password-spraying attacks (ps-001 / T1110.003).
 
     Flags any source IP targeting >= threshold distinct users within window_minutes.
+
+    Args:
+        logs: List of parsed log dicts from parser.parse_log.
+        threshold: Minimum number of distinct targeted users to trigger an alert.
+        window_minutes: Sliding time window in minutes.
+
+    Returns:
+        A list of alert dicts with keys: ip, user, count, distinct_users, start_time, rule, rule_id, mitre, sigma_severity.
     """
     rule = SIGMA_RULES["password_spraying"]
     alerts = []
@@ -118,6 +134,14 @@ def detect_impossible_travel(logs, threshold=TRAVEL_THRESHOLD, window_minutes=TR
     Flags any user seen logging in successfully from >= threshold distinct IPs
     within window_minutes. Uses SUCCESS events only - impossible travel is a
     valid-account abuse pattern, not a failed-login pattern.
+
+    Args:
+        logs: List of parsed log dicts from parser.parse_log.
+        threshold: Minimum number of distinct source IPs to trigger an alert.
+        window_minutes: Sliding time window in minutes.
+
+    Returns:
+        A list of alert dicts with keys: ip, user, count, distinct_ips, start_time, rule, rule_id, mitre, sigma_severity.
     """
     rule = SIGMA_RULES["impossible_travel"]
     alerts = []

@@ -13,6 +13,7 @@ _cached_alerts: list = run_pipeline()
 
 @app.route("/")
 def home():
+    """Return a JSON welcome message with the available /alerts endpoint."""
     return {"message": "SOC Dashboard running",
             "endpoint": "/alerts",
             "description": "View detected security alerts"}
@@ -20,6 +21,7 @@ def home():
 
 @app.route("/alerts")
 def alerts():
+    """Return all cached alerts as JSON with a total count."""
     return {"alerts": _cached_alerts,
             "total_alerts": len(_cached_alerts)}
 
