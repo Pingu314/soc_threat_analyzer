@@ -1,9 +1,7 @@
 import logging
 
-from config.settings import (SUSPICIOUS_COUNTRIES, LOGIN_EVENT_WEIGHT,
-                             SUSPICIOUS_COUNTRY_SCORE, TOR_SCORE,
-                             SPRAY_USER_WEIGHT, TRAVEL_IP_WEIGHT,
-                             SEVERITY_HIGH, SEVERITY_MEDIUM)
+from config.settings import (SUSPICIOUS_COUNTRIES, LOGIN_EVENT_WEIGHT, SUSPICIOUS_COUNTRY_SCORE, TOR_SCORE,
+                             SPRAY_USER_WEIGHT, TRAVEL_IP_WEIGHT, SEVERITY_HIGH, SEVERITY_MEDIUM)
 
 logger = logging.getLogger(__name__)
 

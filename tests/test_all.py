@@ -1,12 +1,7 @@
 from datetime import datetime, timedelta
 
 from src.risk_scoring import calculate_risk, get_severity, map_mitre
-from src.detector import (
-    detect_bruteforce,
-    detect_password_spraying,
-    detect_impossible_travel,
-    run_all_detections,
-)
+from src.detector import (detect_bruteforce, detect_password_spraying, detect_impossible_travel, run_all_detections)
 from src.parser import parse_log
 from src.threat_intel import is_private_ip
 

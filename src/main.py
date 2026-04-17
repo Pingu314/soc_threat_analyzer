@@ -68,8 +68,7 @@ if __name__ == "__main__":
 
     os.makedirs("output", exist_ok=True)
 
-    fieldnames = ["rule_id", "rule", "mitre", "sigma_severity",
-                  "ip", "user", "count", "country", "org",
+    fieldnames = ["rule_id", "rule", "mitre", "sigma_severity", "ip", "user", "count", "country", "org",
                   "risk_score", "severity", "distinct_users", "distinct_ips"]
 
     with open("output/alerts.csv", "w", newline="") as f:

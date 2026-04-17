@@ -2,14 +2,8 @@ from collections import defaultdict
 from datetime import timedelta
 import logging
 
-from config.settings import (
-    THRESHOLD,
-    WINDOW_MINUTES,
-    SPRAY_THRESHOLD,
-    SPRAY_WINDOW_MINUTES,
-    TRAVEL_THRESHOLD,
-    TRAVEL_WINDOW_MINUTES,
-)
+from config.settings import (THRESHOLD, WINDOW_MINUTES, SPRAY_THRESHOLD, SPRAY_WINDOW_MINUTES,
+                             TRAVEL_THRESHOLD, TRAVEL_WINDOW_MINUTES)
 
 logger = logging.getLogger(__name__)
 
@@ -156,12 +150,8 @@ def detect_impossible_travel(logs, threshold=TRAVEL_THRESHOLD, window_minutes=TR
     return alerts
 
 
-def run_all_detections(logs,
-                       threshold=THRESHOLD,
-                       window_minutes=WINDOW_MINUTES,
-                       spray_threshold=SPRAY_THRESHOLD,
-                       spray_window_minutes=SPRAY_WINDOW_MINUTES,
-                       travel_threshold=TRAVEL_THRESHOLD,
+def run_all_detections(logs, threshold=THRESHOLD, window_minutes=WINDOW_MINUTES, spray_threshold=SPRAY_THRESHOLD,
+                       spray_window_minutes=SPRAY_WINDOW_MINUTES, travel_threshold=TRAVEL_THRESHOLD,
                        travel_window_minutes=TRAVEL_WINDOW_MINUTES):
     """Run all SIGMA detection rules and return deduplicated alerts."""
     all_alerts = (detect_bruteforce(logs, threshold, window_minutes)

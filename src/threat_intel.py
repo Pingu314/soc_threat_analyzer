@@ -27,7 +27,7 @@ def is_private_ip(ip: str) -> bool:
 
 
 def get_ip_info(ip: str) -> dict | None:
-    """Enrich an IP address with geolocation and organisation data via ipinfo.io.
+    """Enrich an IP address with geolocation and organization data via ipinfo.io.
 
     Private IPs are handled locally without an API call. Results are cached
     in-memory for the lifetime of the process to avoid redundant requests.
