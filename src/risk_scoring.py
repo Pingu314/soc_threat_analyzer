@@ -40,6 +40,8 @@ def calculate_risk(alert: dict, intel: dict | None) -> int:
             score += TOR_SCORE
 
         if intel.get("country") == "PRIVATE":
+            # Private/internal IPs are scored normally — internal lateral movement
+            # is still a risk and should not be silently discarded.
             logger.info(f"Internal IP flagged: {alert.get('ip')}")
 
     if "distinct_users" in alert:
