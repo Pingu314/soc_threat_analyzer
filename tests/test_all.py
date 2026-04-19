@@ -1,4 +1,3 @@
-import os
 from unittest.mock import patch
 from datetime import datetime, timedelta
 from src.risk_scoring import calculate_risk, get_severity, map_mitre
@@ -229,7 +228,7 @@ class TestRunPipeline:
         assert "risk_score" in alert
         assert "country" in alert
 
-    def test_pipeline_alert_has_expected_keys(self, tmp_path):
+    def test_pipeline_alert_has_expected_keys(self):
         mock_intel = {"ip": "1.2.3.4", "country": "RU", "org": "SomeISP"}
         expected_keys = {"rule_id", "rule", "mitre", "sigma_severity", "ip", "user", "count", "country", "org",
                          "risk_score", "severity"}
