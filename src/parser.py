@@ -42,9 +42,9 @@ def parse_log(file_path: str) -> list[dict]:
                              "user": user,
                              "ip": ip})
 
-            except Exception as e:
+            except (ValueError, IndexError, AttributeError) as e:
                 skipped += 1
-                logger.debug(f"Skipped line {line_num}: {e} | Content: '{line}'")
+                logger.debug(f"Skipped line {line_num}: {e!r} | Content: {line!r}")
 
     if skipped:
         logger.warning(f"Skipped {skipped} unparseable line(s) in {file_path}")
