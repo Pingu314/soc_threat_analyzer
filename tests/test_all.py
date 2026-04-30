@@ -198,6 +198,7 @@ class TestParseLog:
         logs = parse_log(str(log_file))
         assert len(logs) == 1
 
+
 # pipeline
 class TestRunPipeline:
     """Integration test: full pipeline from log file to enriched alert list."""

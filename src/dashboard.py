@@ -1,6 +1,6 @@
 import logging
 from flask import Flask
-from src.main import run_pipeline
+from main import run_pipeline
 
 app = Flask(__name__)
 logger = logging.getLogger(__name__)

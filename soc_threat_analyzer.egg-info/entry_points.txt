@@ -1,0 +1,2 @@
+[console_scripts]
+soc-analyze = src.main:run_pipeline

@@ -9,6 +9,7 @@ MITRE_MAPPING = {"T1110.001": "Brute Force: Password Guessing",
                  "T1110.003": "Brute Force: Password Spraying",
                  "T1078":     "Valid Accounts: Impossible Travel"}
 
+
 def calculate_risk(alert: dict, intel: dict | None) -> int:
     """Calculate a numeric risk score for an alert using threat intelligence data.
 
@@ -51,6 +52,7 @@ def calculate_risk(alert: dict, intel: dict | None) -> int:
         score += len(alert["distinct_ips"]) * TRAVEL_IP_WEIGHT
 
     return score
+
 
 def get_severity(score: int) -> str:
     """Convert a numeric risk score into a severity label.

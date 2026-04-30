@@ -3,6 +3,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 def parse_log(file_path: str) -> list[dict]:
     """Parse an authentication log file into a list of structured log entries.
 
