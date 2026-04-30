@@ -4,7 +4,7 @@ A Python-based Security Operations Center (SOC) simulation tool that detects aut
 
 > I built this project while studying for CompTIA Security+ and working through
 > TryHackMe SOC Level 1. My goal was to simulate real SOC Tier 1 workflows in
-> code — detection, enrichment and triage — rather than just reading about them.
+> code - detection, enrichment and triage - rather than just reading about them.
 > I learn best hands-on.
 
 ## Scenario
@@ -17,13 +17,13 @@ Ingest -> Parse -> Detect -> Enrich -> Score -> Alert
 
 ## Detection Rules (SIGMA-based)
 
-All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thresholds and time windows are driven by `config/settings.py` — no hardcoded values.
+All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thresholds and time windows are driven by `config/settings.py` - no hardcoded values.
 
-| Rule ID | Rule | MITRE Technique | Trigger |
-|---------|------|----------------|---------|
-| bf-001 | Brute Force Detection | T1110.001 – Password Guessing | ≥3 failed logins from one IP within 5 min |
-| ps-001 | Password Spraying Detection | T1110.003 – Password Spraying | ≥3 distinct users targeted from one IP within 10 min |
-| it-001 | Impossible Travel Detection | T1078 – Valid Accounts | Same user from ≥2 distinct IPs within 5 min |
+| Rule ID | Rule | MITRE Technique               | Trigger |
+|---------|------|-------------------------------|---------|
+| bf-001 | Brute Force Detection | T1110.001 - Password Guessing | ≥3 failed logins from one IP within 5 min |
+| ps-001 | Password Spraying Detection | T1110.003 - Password Spraying | ≥3 distinct users targeted from one IP within 10 min |
+| it-001 | Impossible Travel Detection | T1078 - Valid Accounts        | Same user from ≥2 distinct IPs within 5 min |
 
 ## Example Output
 
@@ -139,12 +139,12 @@ dashboard.py    -> Flask REST API at /alerts
 - Three functional SIGMA-based detection rules
 - Alert deduplication across detection passes
 - IP enrichment via ipinfo.io with in-memory caching
-- Private IP detection (RFC 1918) — no wasted API calls
+- Private IP detection (RFC 1918) - no wasted API calls
 - MITRE ATT&CK sub-technique mapping
 - CSV export with full alert context
 - Flask REST dashboard at `/alerts`
 - Structured logging via Python `logging` module
-- 33 unit and integration tests with pytest and shared fixtures
+- 35 unit and integration tests with pytest and shared fixtures
 
 ## Technologies
 
