@@ -27,10 +27,10 @@ All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thre
 
 ## Example Output
 
-Running `python -m src.main` against the sample logs produces 8 alerts across all three rules:
+Running `soc-analyze` against the sample logs produces 8 alerts across all three rules:
 
 ```text
-$ python -m src.main
+$ soc-analyze
 
 [bf-001] Brute force from 185.220.101.1 (4 attempts)
 [bf-001] Brute force from 192.168.1.10 (3 attempts)
@@ -90,7 +90,6 @@ Total alerts after deduplication: 8
 }
 ```
 
-
 ## Architecture
 
 ```
@@ -138,13 +137,13 @@ dashboard.py    -> Flask REST API at /alerts
 - Log parsing with per-line error handling and skip-logging
 - Three functional SIGMA-based detection rules
 - Alert deduplication across detection passes
-- IP enrichment via ipinfo.io with in-memory caching
+- IP enrichment via ipinfo.io with in-memory caching and token support
 - Private IP detection (RFC 1918) - no wasted API calls
 - MITRE ATT&CK sub-technique mapping
 - CSV export with full alert context
 - Flask REST dashboard at `/alerts`
 - Structured logging via Python `logging` module
-- 35 unit and integration tests with pytest and shared fixtures
+- 35 unit and integration tests across 5 focused test modules
 
 ## Technologies
 
@@ -168,39 +167,41 @@ soc_threat_analyzer/
 │   ├── main.py             # pipeline orchestration + CSV export
 │   ├── parser.py           # log file parser
 │   ├── detector.py         # SIGMA rules + all detection logic
-│   ├── threat_intel.py     # ipinfo.io enrichment with caching
+│   ├── threat_intel.py     # ipinfo.io enrichment with caching + token support
 │   ├── risk_scoring.py     # scoring + severity + MITRE mapping
 │   └── dashboard.py        # Flask REST API
 ├── tests/
 │   ├── conftest.py         # shared pytest fixtures
-│   └── test_all.py         # 32 unit + integration tests
-├── output/
-│   └── alerts.csv          # generated output (gitignored)
-├── requirements.txt
+│   ├── test_detector.py    # brute force, spraying, impossible travel, deduplication
+│   ├── test_scoring.py     # risk scoring, severity, MITRE mapping
+│   ├── test_parser.py      # log parsing and error handling
+│   ├── test_threat_intel.py # private IP detection
+│   └── test_pipeline.py    # end-to-end integration tests
+├── output/                 # generated output (gitignored)
 └── .gitignore
 ```
 
 ## How to Run
 
 ```bash
-pip install -r requirements.txt
-python -m src.main
-```
+# Install
+pip install -e .
 
-Flask dashboard:
-```bash
+# Run pipeline
+soc-analyze
+
+# Run dashboard
 python -m src.dashboard
 # → http://localhost:5000/alerts
-```
 
-Tests:
-```bash
-python -m pytest tests/ -v
+# Run tests
+pip install -e ".[dev]"
+pytest tests/ -v
 ```
 
 ## Configuration
 
-Edit `config/settings.py` to tune detection behaviour — no changes needed elsewhere:
+Edit `config/settings.py` to tune detection behaviour - no changes needed elsewhere:
 
 ```python
 THRESHOLD = 3            # brute force: failed login threshold
@@ -213,6 +214,17 @@ SUSPICIOUS_COUNTRIES = ["RU", "CN", "KP"]
 SEVERITY_HIGH = 12
 SEVERITY_MEDIUM = 6
 ```
+
+### IP Enrichment Token
+
+ipinfo.io works without a token (50k requests/month free). To use your own token:
+
+```bash
+cp .env.example .env
+# Edit .env and set IPINFO_TOKEN=your_token_here
+```
+
+The token is read from the `IPINFO_TOKEN` environment variable at startup.
 
 ## Limitations
 
