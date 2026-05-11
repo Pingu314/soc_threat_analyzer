@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 _cache = {}
 _TOKEN = os.environ.get("IPINFO_TOKEN", "")
 
+
 def is_private_ip(ip: str) -> bool:
     """Return True if the given IP address is private, loopback, or link-local.
 
