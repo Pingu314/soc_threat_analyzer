@@ -1,11 +1,12 @@
 import logging
 import requests
 import ipaddress
+import os
 
 logger = logging.getLogger(__name__)
 
 _cache = {}
-
+_TOKEN = os.environ.get("IPINFO_TOKEN", "")
 
 def is_private_ip(ip: str) -> bool:
     """Return True if the given IP address is private, loopback, or link-local.
@@ -48,8 +49,9 @@ def get_ip_info(ip: str) -> dict | None:
         return _cache[ip]
 
     try:
+        params = {"token": _TOKEN} if _TOKEN else {}
         url = f"https://ipinfo.io/{ip}/json"
-        response = requests.get(url, timeout=3)
+        response = requests.get(url, params=params, timeout=3)
         if response.status_code == 200:
             data = response.json()
             result = {"ip": ip,
