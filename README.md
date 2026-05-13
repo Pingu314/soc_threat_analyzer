@@ -2,6 +2,11 @@
 
 A Python-based Security Operations Center (SOC) simulation tool that detects authentication-based attacks, enriches alerts with threat intelligence, and prioritizes incidents using risk scoring mapped to MITRE ATT&CK.
 
+![CI](https://github.com/Pingu314/soc_threat_analyzer/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 > I built this project while studying for CompTIA Security+ and working through
 > TryHackMe SOC Level 1. My goal was to simulate real SOC Tier 1 workflows in
 > code - detection, enrichment and triage - rather than just reading about them.
@@ -17,13 +22,13 @@ Ingest -> Parse -> Detect -> Enrich -> Score -> Alert
 
 ## Detection Rules (SIGMA-based)
 
-All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thresholds and time windows are driven by `config/settings.py` - no hardcoded values.
+All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thresholds and time windows are driven by `config/settings.py` — no hardcoded values.
 
-| Rule ID | Rule | MITRE Technique               | Trigger |
-|---------|------|-------------------------------|---------|
-| bf-001 | Brute Force Detection | T1110.001 - Password Guessing | ≥3 failed logins from one IP within 5 min |
-| ps-001 | Password Spraying Detection | T1110.003 - Password Spraying | ≥3 distinct users targeted from one IP within 10 min |
-| it-001 | Impossible Travel Detection | T1078 - Valid Accounts        | Same user from ≥2 distinct IPs within 5 min |
+| Rule ID | Rule | MITRE Technique | Trigger |
+|---------|------|-----------------|---------|
+| bf-001 | Brute Force Detection | T1110.001 - Password Guessing | >=3 failed logins from one IP within 5 min |
+| ps-001 | Password Spraying Detection | T1110.003 - Password Spraying | >=3 distinct users targeted from one IP within 10 min |
+| it-001 | Impossible Travel Detection | T1078 - Valid Accounts | Same user from >=2 distinct IPs within 5 min |
 
 ## Example Output
 
@@ -44,7 +49,7 @@ $ soc-analyze
 Total alerts after deduplication: 8
 ```
 
-**Sample enriched alerts (JSON):**
+**Sample enriched alert (JSON):**
 
 ```json
 {
@@ -60,60 +65,32 @@ Total alerts after deduplication: 8
   "risk_score": 12,
   "severity": "HIGH"
 }
-{
-  "rule_id": "ps-001",
-  "rule": "Password Spraying Detection",
-  "mitre": "T1110.003",
-  "sigma_severity": "high",
-  "ip": "45.83.64.1",
-  "user": "multiple",
-  "count": 5,
-  "country": "DE",
-  "org": "AS208843 Alpha Strike Labs GmbH",
-  "risk_score": 25,
-  "severity": "HIGH",
-  "distinct_users": "admin, guest, operator, root, test"
-}
-{
-  "rule_id": "it-001",
-  "rule": "Impossible Travel Detection",
-  "mitre": "T1078",
-  "sigma_severity": "medium",
-  "ip": "multiple",
-  "user": "jsmith",
-  "count": 2,
-  "country": "Unknown",
-  "org": "Unknown",
-  "risk_score": 10,
-  "severity": "MEDIUM",
-  "distinct_ips": "103.21.244.0, 185.220.101.1"
-}
 ```
 
 ## Architecture
 
 ```
-logs.txt
-   │
-   ▼
+log file(s) / directory
+       |
+       v
 parser.py       -> parses log entries, skips malformed lines
-   │
-   ▼
+       |
+       v
 detector.py     -> runs all SIGMA rules, deduplicates alerts
-   ├─ bf-001    Brute Force       (T1110.001)
-   ├─ ps-001    Password Spraying (T1110.003)
-   └─ it-001    Impossible Travel (T1078)
-   │
-   ▼
+   +- bf-001    Brute Force       (T1110.001)
+   +- ps-001    Password Spraying (T1110.003)
+   +- it-001    Impossible Travel (T1078)
+       |
+       v
 threat_intel.py -> ipinfo.io enrichment with in-memory cache
-                  private IP detection (RFC 1918)
-   │
-   ▼
+                   private IP detection (RFC 1918)
+       |
+       v
 risk_scoring.py -> calculates risk score, severity, MITRE label
-   │
-   ▼
+       |
+       v
 main.py         -> prints alerts + exports to output/alerts.csv
-dashboard.py    -> Flask REST API at /alerts
+dashboard.py    -> Flask REST API
 ```
 
 ## Risk Scoring
@@ -128,8 +105,8 @@ dashboard.py    -> Flask REST API at /alerts
 
 | Score | Severity |
 |-------|----------|
-| 0–5 | LOW |
-| 6–11 | MEDIUM |
+| 0-5 | LOW |
+| 6-11 | MEDIUM |
 | 12+ | HIGH |
 
 ## Features
@@ -137,20 +114,23 @@ dashboard.py    -> Flask REST API at /alerts
 - Log parsing with per-line error handling and skip-logging
 - Three functional SIGMA-based detection rules
 - Alert deduplication across detection passes
-- IP enrichment via ipinfo.io with in-memory caching and token support
+- Single file, directory, or recursive folder ingestion
+- Multi-file cross-file correlation - impossible travel and spraying detected across host boundaries
+- Runtime threshold overrides via CLI flags or dashboard query params — no config file editing required
+- IP enrichment via ipinfo.io with in-memory caching and optional token support
 - Private IP detection (RFC 1918) - no wasted API calls
 - MITRE ATT&CK sub-technique mapping
 - CSV export with full alert context
-- Flask REST dashboard at `/alerts`
-- Structured logging via Python `logging` module
-- 35 unit and integration tests across 5 focused test modules
+- Flask REST dashboard with single and multi-file upload
+- Structured logging via Python logging module
+- 113 tests across 7 focused modules, 93% coverage
 
 ## Technologies
 
 - Python 3.10+
 - Flask (REST dashboard)
 - requests + ipinfo.io (threat intelligence)
-- pytest (unit testing)
+- pytest + pytest-cov (testing)
 - MITRE ATT&CK (T1110.001, T1110.003, T1078)
 - SIGMA rule format
 
@@ -158,27 +138,30 @@ dashboard.py    -> Flask REST API at /alerts
 
 ```
 soc_threat_analyzer/
-├── config/
-│   └── settings.py         # single source of truth for all config
-├── data/
-│   ├── logs.txt            # sample authentication logs
-│   └── ips.txt             # sample IP list
-├── src/
-│   ├── main.py             # pipeline orchestration + CSV export
-│   ├── parser.py           # log file parser
-│   ├── detector.py         # SIGMA rules + all detection logic
-│   ├── threat_intel.py     # ipinfo.io enrichment with caching + token support
-│   ├── risk_scoring.py     # scoring + severity + MITRE mapping
-│   └── dashboard.py        # Flask REST API
-├── tests/
-│   ├── conftest.py         # shared pytest fixtures
-│   ├── test_detector.py    # brute force, spraying, impossible travel, deduplication
-│   ├── test_scoring.py     # risk scoring, severity, MITRE mapping
-│   ├── test_parser.py      # log parsing and error handling
-│   ├── test_threat_intel.py # private IP detection
-│   └── test_pipeline.py    # end-to-end integration tests
-├── output/                 # generated output (gitignored)
-└── .gitignore
++-- config/
+|   +-- settings.py             # single source of truth for all thresholds
++-- data/
+|   +-- logs.txt                # sample authentication logs
+|   +-- ips.txt                 # sample IP list
++-- src/
+|   +-- main.py                 # pipeline, folder/file ingestion, CLI, CSV export
+|   +-- parser.py               # log file parser
+|   +-- detector.py             # SIGMA rules + detection logic
+|   +-- threat_intel.py         # ipinfo.io enrichment with caching + token support
+|   +-- risk_scoring.py         # scoring + severity + MITRE mapping
+|   +-- dashboard.py            # Flask REST API with upload endpoint
++-- tests/
+|   +-- conftest.py             # shared pytest fixtures
+|   +-- test_detector.py        # brute force, spraying, impossible travel, deduplication
+|   +-- test_scoring.py         # risk scoring, severity, MITRE mapping
+|   +-- test_parser.py          # log parsing and error handling
+|   +-- test_threat_intel.py    # private IP detection, get_ip_info, caching
+|   +-- test_pipeline.py        # single file, multi-file, folder scan, CSV export
+|   +-- test_dashboard.py       # all dashboard endpoints
+|   +-- test_main.py            # CLI arg parser, __main__ execution paths
++-- output/                     # generated output (gitignored)
++-- .env.example                # token configuration template
++-- .gitignore
 ```
 
 ## How to Run
@@ -187,21 +170,68 @@ soc_threat_analyzer/
 # Install
 pip install -e .
 
-# Run pipeline
+# Analyze sample data (default)
 soc-analyze
 
-# Run dashboard
-python -m src.dashboard
-# → http://localhost:5000/alerts
+# Analyze a custom log file
+soc-analyze --logs /path/to/auth.log
 
-# Run tests
+# Analyze all .log/.txt files in a directory
+soc-analyze --logs-dir /path/to/logs/
+
+# Analyze recursively (includes subdirectories)
+soc-analyze --logs-dir /path/to/logs/ --recursive
+
+# Override detection thresholds at runtime
+soc-analyze --logs /path/to/auth.log --threshold 2 --window 3
+soc-analyze --logs-dir /path/to/logs/ --spray-threshold 2 --travel-threshold 2
+
+# Custom output path
+soc-analyze --logs /path/to/auth.log --output /path/to/results.csv
+
+# Skip CSV export
+soc-analyze --logs-dir /path/to/logs/ --no-export
+
+# All options
+soc-analyze --help
+```
+
+Flask dashboard:
+```bash
+python -m src.dashboard
+# -> http://localhost:5000
+```
+
+Dashboard endpoints:
+```
+GET    /               Welcome + endpoint list + parameter docs
+GET    /alerts         Alerts from sample data (data/logs.txt)
+GET    /alerts/summary Severity counts and rule breakdown
+POST   /upload         Analyze one or more uploaded log files
+DELETE /cache          Clear cached sample-data alerts
+```
+
+Upload examples:
+```bash
+# Single file
+curl -X POST http://localhost:5000/upload -F "file=@auth.log"
+
+# Multiple files (cross-file correlation applies)
+curl -X POST http://localhost:5000/upload -F "file=@host1.log" -F "file=@host2.log"
+
+# With threshold overrides
+curl -X POST "http://localhost:5000/upload?threshold=2&window=3" -F "file=@auth.log"
+```
+
+Tests:
+```bash
 pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
 ## Configuration
 
-Edit `config/settings.py` to tune detection behaviour - no changes needed elsewhere:
+Edit `config/settings.py` to tune detection behaviour — no changes needed elsewhere:
 
 ```python
 THRESHOLD = 3            # brute force: failed login threshold
@@ -215,16 +245,16 @@ SEVERITY_HIGH = 12
 SEVERITY_MEDIUM = 6
 ```
 
+All thresholds can be overridden at runtime via CLI flags or dashboard query parameters without editing `settings.py`.
+
 ### IP Enrichment Token
 
 ipinfo.io works without a token (50k requests/month free). To use your own token:
 
 ```bash
 cp .env.example .env
-# Edit .env and set IPINFO_TOKEN=your_token_here
+# Edit .env: IPINFO_TOKEN=your_token_here
 ```
-
-The token is read from the `IPINFO_TOKEN` environment variable at startup.
 
 ## Limitations
 
@@ -235,11 +265,10 @@ The token is read from the `IPINFO_TOKEN` environment variable at startup.
 ## Future Improvements
 
 - SIEM integration (Splunk / ELK)
-- Real-time log ingestion
-- AbuseIPDB or VirusTotal integration
+- Real-time log ingestion (file watcher)
+- AbuseIPDB or VirusTotal enrichment
 - Persistent cache (Redis)
-- Alert correlation across multiple sources
-- Dashboard visualization
+- Dashboard visualization (charts)
 
 ## Disclaimer
 
