@@ -116,7 +116,7 @@ dashboard.py    -> Flask REST API
 - Alert deduplication across detection passes
 - Single file, directory, or recursive folder ingestion
 - Multi-file cross-file correlation - impossible travel and spraying detected across host boundaries
-- Runtime threshold overrides via CLI flags or dashboard query params — no config file editing required
+- Runtime threshold overrides via CLI flags or dashboard query params - no config file editing required
 - CSV export with configurable output path, skippable via `--no-export`
 - IP enrichment via ipinfo.io with in-memory caching and optional token support
 - Private IP detection (RFC 1918) - no wasted API calls
