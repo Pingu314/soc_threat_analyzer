@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import timedelta
+from datetime import datetime, timedelta
 import logging
 
 from config.settings import (THRESHOLD, WINDOW_MINUTES, SPRAY_THRESHOLD, SPRAY_WINDOW_MINUTES,
@@ -39,12 +39,13 @@ SIGMA_RULES = {"brute_force": {"title": "Brute Force Detection",
                                      "severity": "medium"}}
 
 
-def _get_window(times, index, window_minutes):
+def _get_window(times: list[datetime], index: int, window_minutes: int) -> list[datetime]:
     t0 = times[index]
     return [t for t in times if t0 <= t <= t0 + timedelta(minutes=window_minutes)]
 
 
-def detect_bruteforce(logs, threshold=THRESHOLD, window_minutes=WINDOW_MINUTES):
+def detect_bruteforce(logs: list[dict], threshold: int = THRESHOLD, window_minutes: int = WINDOW_MINUTES) -> list[dict]:
+
     """Detect brute-force login attempts (bf-001 / T1110.001).
 
     Flags any source IP with >= threshold failed logins within window_minutes.
@@ -84,7 +85,8 @@ def detect_bruteforce(logs, threshold=THRESHOLD, window_minutes=WINDOW_MINUTES):
     return alerts
 
 
-def detect_password_spraying(logs, threshold=SPRAY_THRESHOLD, window_minutes=SPRAY_WINDOW_MINUTES):
+def detect_password_spraying(logs: list[dict], threshold: int = SPRAY_THRESHOLD, window_minutes: int = SPRAY_WINDOW_MINUTES) -> list[dict]:
+
     """Detect password-spraying attacks (ps-001 / T1110.003).
 
     Flags any source IP targeting >= threshold distinct users within window_minutes.
@@ -128,7 +130,7 @@ def detect_password_spraying(logs, threshold=SPRAY_THRESHOLD, window_minutes=SPR
     return alerts
 
 
-def detect_impossible_travel(logs, threshold=TRAVEL_THRESHOLD, window_minutes=TRAVEL_WINDOW_MINUTES):
+def detect_impossible_travel(logs: list[dict], threshold: int = TRAVEL_THRESHOLD, window_minutes: int = TRAVEL_WINDOW_MINUTES) -> list[dict]:
     """Detect impossible-travel logins (it-001 / T1078).
 
     Flags any user seen logging in successfully from >= threshold distinct IPs
@@ -174,9 +176,9 @@ def detect_impossible_travel(logs, threshold=TRAVEL_THRESHOLD, window_minutes=TR
     return alerts
 
 
-def run_all_detections(logs, threshold=THRESHOLD, window_minutes=WINDOW_MINUTES, spray_threshold=SPRAY_THRESHOLD,
-                       spray_window_minutes=SPRAY_WINDOW_MINUTES, travel_threshold=TRAVEL_THRESHOLD,
-                       travel_window_minutes=TRAVEL_WINDOW_MINUTES):
+def run_all_detections(logs: list[dict], threshold: int = THRESHOLD, window_minutes: int = WINDOW_MINUTES,
+                       spray_threshold: int = SPRAY_THRESHOLD, spray_window_minutes: int = SPRAY_WINDOW_MINUTES,
+                       travel_threshold: int = TRAVEL_THRESHOLD, travel_window_minutes: int = TRAVEL_WINDOW_MINUTES) -> list[dict]:
     """Run all SIGMA detection rules and return deduplicated alerts."""
     all_alerts = (detect_bruteforce(logs, threshold, window_minutes)
                   + detect_password_spraying(logs, spray_threshold, spray_window_minutes)
