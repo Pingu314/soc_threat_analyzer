@@ -42,6 +42,23 @@ class TestCalculateRisk:
         score = calculate_risk(alert, None)
         assert score == 6 + 4  # base + 2 IPs * 2
 
+    def test_private_ip_no_extra_score(self):
+        """PRIVATE country branch logs but adds no score — internal movement scored normally."""
+        alert = {"ip": "192.168.1.1", "count": 3}
+        intel = {"ip": "192.168.1.1", "country": "PRIVATE", "org": "Internal Network"}
+        score = calculate_risk(alert, intel)
+        assert score == 9  # base only, PRIVATE adds nothing
+
+    def test_cn_suspicious_country(self):
+        alert = {"ip": "1.2.3.4", "count": 3}
+        intel = {"ip": "1.2.3.4", "country": "CN", "org": "SomeISP"}
+        assert calculate_risk(alert, intel) == 14
+
+    def test_kp_suspicious_country(self):
+        alert = {"ip": "1.2.3.4", "count": 3}
+        intel = {"ip": "1.2.3.4", "country": "KP", "org": "SomeISP"}
+        assert calculate_risk(alert, intel) == 14
+
 
 class TestMapMitre:
     def test_brute_force_subtechnique(self):
