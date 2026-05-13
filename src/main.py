@@ -246,7 +246,8 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     return p
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """CLI entrypoint for soc-analyze"""
     args = _build_arg_parser().parse_args()
 
     override_kwargs = {
@@ -275,3 +276,7 @@ if __name__ == "__main__":
 
     if not args.no_export and alerts:
         _save_csv(alerts, args.output)
+
+
+if __name__ == "__main__":
+    main()
