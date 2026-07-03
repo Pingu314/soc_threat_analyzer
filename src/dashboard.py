@@ -166,7 +166,6 @@ def clear_cache() -> tuple:
     return jsonify({"message": "Cache cleared. Next /alerts call re-runs the pipeline."}), 200
 
 
-
 _UI_TEMPLATE = """<!doctype html>
 <html lang="en">
 <head>
