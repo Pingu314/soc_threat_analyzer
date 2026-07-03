@@ -259,3 +259,41 @@ class TestClearCache:
     def test_returns_confirmation_message(self, client):
         data = client.delete("/cache").get_json()
         assert "message" in data
+
+
+# ---------------------------------------------------------------------------
+# GET /ui
+# ---------------------------------------------------------------------------
+
+class TestUI:
+    def test_returns_200(self, client):
+        dashboard_module._cached_alerts = MOCK_ALERTS
+        response = client.get("/ui")
+        assert response.status_code == 200
+
+    def test_returns_html(self, client):
+        dashboard_module._cached_alerts = MOCK_ALERTS
+        response = client.get("/ui")
+        assert b"<!doctype html>" in response.data
+        assert b"SOC Threat Analyzer" in response.data
+
+    def test_contains_all_alerts(self, client):
+        dashboard_module._cached_alerts = MOCK_ALERTS
+        html = client.get("/ui").data.decode()
+        for alert in MOCK_ALERTS:
+            assert alert["rule"] in html
+
+    def test_sorted_by_risk_score_descending(self, client):
+        dashboard_module._cached_alerts = MOCK_ALERTS
+        html = client.get("/ui").data.decode()
+        spray = html.index("Password Spraying Detection")
+        travel = html.index("Impossible Travel Detection")
+        brute = html.index("Brute Force Detection")
+        assert spray < travel < brute
+
+    def test_severity_chips_rendered(self, client):
+        dashboard_module._cached_alerts = MOCK_ALERTS
+        html = client.get("/ui").data.decode()
+        assert 'chip HIGH' in html
+        assert 'chip MEDIUM' in html
+        assert 'chip LOW' in html

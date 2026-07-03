@@ -1,6 +1,8 @@
 # SOC Threat Analyzer
 
-A Python-based Security Operations Center (SOC) simulation tool that detects authentication-based attacks, enriches alerts with threat intelligence, and prioritizes incidents using risk scoring mapped to MITRE ATT&CK.
+A Python detection pipeline that identifies authentication-based attacks, enriches alerts with threat intelligence, and prioritizes incidents using risk scoring mapped to MITRE ATT&CK.
+
+The same detection logic drives fraud monitoring in the card business: impossible travel, velocity checks and pattern-based alerting are core techniques in both worlds. I spent two years doing exactly this kind of triage in 24/7 fraud detection at a Swiss payment services provider - this project rebuilds the craft in code.
 
 ![CI](https://github.com/Pingu314/soc_threat_analyzer/actions/workflows/ci.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen)
@@ -8,13 +10,15 @@ A Python-based Security Operations Center (SOC) simulation tool that detects aut
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > I built this project while studying for CompTIA Security+ and working through
-> TryHackMe SOC Level 1. My goal was to simulate real SOC Tier 1 workflows in
-> code - detection, enrichment and triage - rather than just reading about them
-> I learn best hands-on
+> TryHackMe SOC Level 1. My goal was to implement real detection workflows in
+> code - detection, enrichment and triage - rather than just reading about them.
+> I learn best hands-on.
+
+![Alert triage dashboard](docs/screenshot_dashboard.png)
 
 ## Scenario
 
-This project simulates a SOC environment where authentication log analysis is used to detect active attack patterns. The pipeline mirrors real SOC Tier 1 workflows:
+This project simulates an environment where authentication log analysis is used to detect active attack patterns. The pipeline mirrors real triage workflows:
 
 ```
 Ingest -> Parse -> Detect -> Enrich -> Score -> Alert
@@ -116,14 +120,14 @@ dashboard.py    -> Flask REST API
 - Alert deduplication across detection passes
 - Single file, directory, or recursive folder ingestion
 - Multi-file cross-file correlation - impossible travel and spraying detected across host boundaries
-- Runtime threshold overrides via CLI flags or dashboard query params — no config file editing required
+- Runtime threshold overrides via CLI flags or dashboard query params - no config file editing required
 - CSV export with configurable output path, skippable via `--no-export`
 - IP enrichment via ipinfo.io with in-memory caching and optional token support
 - Private IP detection (RFC 1918) - no wasted API calls
 - MITRE ATT&CK sub-technique mapping
 - Flask REST dashboard with single and multi-file upload
 - Structured logging via Python `logging` module
-- 113 tests across 7 focused modules, 93% coverage
+- 118 tests across 7 focused modules, 93% coverage
 
 ## Technologies
 
@@ -210,6 +214,7 @@ flask --app src.dashboard run
 Dashboard endpoints:
 ```
 GET    /               Welcome + endpoint list + parameter docs
+GET    /ui             Alert triage view (HTML)
 GET    /alerts         Alerts from sample data (data/logs.txt)
 GET    /alerts/summary Severity counts and rule breakdown
 POST   /upload         Analyze one or more uploaded log files

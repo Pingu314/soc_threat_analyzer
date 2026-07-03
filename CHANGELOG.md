@@ -2,11 +2,14 @@
 
 All notable changes to this project will be documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-
+---
+## [1.2.0] - 2026-07-03
+### Added
+- HTML alert triage view at `/ui`: severity summary cards and a color-coded
+  alert table sorted by risk score. JSON API endpoints unchanged.
 ---
 ## [1.1.0] - 2026-05-13
 ### Added
- 
 **Pipeline**
 - `run_pipeline(log_path, ...)` - accepts a custom log file path instead of hardcoded `data/logs.txt`
 - `run_pipeline_multi(log_paths, ...)` - multi-file ingestion with cross-file correlation; all entries merged before detection so impossible travel and spraying are detected across host boundaries

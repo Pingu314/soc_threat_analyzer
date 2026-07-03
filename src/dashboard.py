@@ -2,7 +2,7 @@ import logging
 import os
 import tempfile
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template_string, request
 
 from src.main import run_pipeline, run_pipeline_multi
 
@@ -52,6 +52,7 @@ def home() -> dict:
     return {
         "message": "SOC Dashboard running",
         "endpoints": {
+            "GET  /ui":             "Alert triage view (HTML)",
             "GET  /alerts":         "Alerts from sample data (data/logs.txt)",
             "GET  /alerts/summary": "Severity counts and rule breakdown",
             "POST /upload":         "Analyze one or more log files (.log or .txt)",
@@ -163,6 +164,87 @@ def clear_cache() -> tuple:
     global _cached_alerts
     _cached_alerts = None
     return jsonify({"message": "Cache cleared. Next /alerts call re-runs the pipeline."}), 200
+
+
+
+_UI_TEMPLATE = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SOC Threat Analyzer - Alert Triage</title>
+<style>
+  body { font-family: "Segoe UI", system-ui, sans-serif; background: #0f1419;
+         color: #e6e6e6; margin: 0; padding: 32px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #8a9aa0; font-size: 13px; margin-bottom: 24px; }
+  .cards { display: flex; gap: 16px; margin-bottom: 24px; }
+  .card { background: #1a222b; border-radius: 8px; padding: 14px 24px; min-width: 96px; }
+  .card .num { font-size: 28px; font-weight: 600; }
+  .card .lbl { font-size: 11px; color: #8a9aa0; text-transform: uppercase;
+               letter-spacing: 1px; }
+  .card.HIGH .num { color: #ff5c5c; }
+  .card.MEDIUM .num { color: #ffb347; }
+  .card.LOW .num { color: #7bd88f; }
+  table { width: 100%; border-collapse: collapse; background: #1a222b;
+          border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px 14px; text-align: left; font-size: 13px; }
+  th { background: #232d38; color: #8a9aa0; text-transform: uppercase;
+       font-size: 11px; letter-spacing: 1px; }
+  tr { border-top: 1px solid #232d38; }
+  .chip { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .chip.HIGH { background: #4a1f1f; color: #ff5c5c; }
+  .chip.MEDIUM { background: #4a3a1f; color: #ffb347; }
+  .chip.LOW { background: #1f4a2b; color: #7bd88f; }
+  .score { font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>SOC Threat Analyzer</h1>
+<div class="sub">Alert triage view &middot; sample data (data/logs.txt)</div>
+<div class="cards">
+  {% for sev in ["HIGH", "MEDIUM", "LOW"] %}
+  <div class="card {{ sev }}">
+    <div class="num">{{ summary.get(sev, 0) }}</div>
+    <div class="lbl">{{ sev }}</div>
+  </div>
+  {% endfor %}
+  <div class="card">
+    <div class="num">{{ alerts | length }}</div>
+    <div class="lbl">Total</div>
+  </div>
+</div>
+<table>
+  <tr>
+    <th>Rule</th><th>MITRE</th><th>Severity</th><th>Risk</th><th>IP</th>
+    <th>User</th><th>Country</th><th>Org</th><th>Count</th>
+  </tr>
+  {% for a in alerts %}
+  <tr>
+    <td>{{ a.rule }}</td>
+    <td>{{ a.mitre }}</td>
+    <td><span class="chip {{ a.severity }}">{{ a.severity }}</span></td>
+    <td class="score">{{ a.risk_score }}</td>
+    <td>{{ a.ip }}</td>
+    <td>{{ a.user }}</td>
+    <td>{{ a.country }}</td>
+    <td>{{ a.org }}</td>
+    <td>{{ a.count }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</body>
+</html>"""
+
+
+@app.route("/ui")
+def ui() -> str:
+    """Render the alert triage view as HTML, sorted by risk score."""
+    data = sorted(_get_alerts(), key=lambda a: a.get("risk_score", 0), reverse=True)
+    summary: dict[str, int] = {}
+    for alert in data:
+        sev = alert.get("severity", "LOW")
+        summary[sev] = summary.get(sev, 0) + 1
+    return render_template_string(_UI_TEMPLATE, alerts=data, summary=summary)
 
 
 if __name__ == "__main__":
