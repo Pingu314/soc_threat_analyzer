@@ -26,7 +26,7 @@ Ingest -> Parse -> Detect -> Enrich -> Score -> Alert
 
 ## Detection Rules (SIGMA-based)
 
-All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thresholds and time windows are driven by `config/settings.py` — no hardcoded values.
+All rules are defined as functional SIGMA-style dicts in `src/detector.py`. Thresholds and time windows are driven by `config/settings.py` - no hardcoded values.
 
 | Rule ID | Rule | MITRE Technique | Trigger |
 |---------|------|-----------------|---------|
