@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "soc-threat-analyzer"
 version = "1.2.0"
-description = "SOC simulation tool for brute-force detection, threat intelligence enrichment and risk scoring"
+description = "Log-based threat detection: brute force, password spraying, impossible travel, threat-intel enrichment, MITRE ATT&CK mapping"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
